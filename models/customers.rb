@@ -18,6 +18,13 @@ class Customer
     @id = customer['id'].to_i
   end
 
+  def update()
+    sql = "UPDATE customers SET (name, funds) = ($1,$2) WHERE id = $3"
+    values = [ @name, @funds, @id]
+    customers = SqlRunner.run(sql, values)
+    return customers
+  end
+
   def self.find(id)
     sql = "SELECT * FROM customers WHERE id = $1;"
     values = [id]
@@ -33,6 +40,17 @@ class Customer
     result = customers.map { |customer|     Customer.new( customer ) }
     return result
   end
+
+  def film()
+  sql = "SELECT films.* FROM films
+        INNER JOIN tickets
+          ON films.id = tickets.film_id
+        WHERE tickets.customer_id = $1;"
+  values = [@id]
+  result = SqlRunner.run(sql, values)
+  films = result.map { |film| Film.new(film) }
+  return films
+end
 
  def self.delete_all()
     sql = "DELETE FROM customers"
